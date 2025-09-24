@@ -13,6 +13,8 @@ class Maze {
 
 		const char* changeToTileset(const char* map[21*12], int map2[21*12], int i); //méthode pour bien afficher le main
 		bool	estVide(int val);
+		bool	estVideCoin(int val);
+		bool	estRempliCoin(int val);
 
 	public : 
 		//Constructor : affichage du maze
@@ -26,133 +28,121 @@ friend std::ostream& operator << (std::ostream& os, const Maze& m);
 
 //Definition des constructeurs
 Maze::Maze(string maze_name) {
-	int i;
-	ifstream f(maze_name);
+ifstream f(maze_name);
+    for (int i=0; i<21*12; i++) {
+        f >> _tab[i];
+    }
+    f.close();
 
-for (i=0; i<21*12 ; i++) 
-{
-	f >> _tab[i];
-	//cout << _tab[i]; SAFE
-	/*if (_tab[i] == 0)  _map[i] = '.';
-	if (_tab[i] == 1) _map[i] = '|';
-	if (_tab[i] == 2) _map[i] = 'E';
-	if (_tab[i] == 3) _map[i] = 'S';*/
+    for (int i=0; i<21*12; i++) {
+        if (estVide(_tab[i])) {
+            if (_tab[i] == 2) _map[i] = "E";   // entrée
+            else if (_tab[i] == 3) _map[i] = "S"; // sortie
+            else _map[i] = " ";  // case vide
+        } else {
+            _map[i] = changeToTileset(_map, _tab, i); // mur avec joli caractère
+        }
+    }
 }
-
-	for (i=0; i<21*12; i++)
-	{
-		//cout << i << endl; SAFE
-		if (!estVide(_tab[i])) //on garde les points en points
-			_map[i] = changeToTileset(_map, _tab, i); //PROBLEME
-	}
-
-	f.close();
-}
-
-const char* Maze::changeToTileset(const char* map[21*12], int map2[21*12], int i)
+	const char* Maze::changeToTileset(const char* map[21*12], int map2[21*12], int i)
 {
-	int		haut;
-	int		bas;
-	int		droite;
-	int		gauche;
-	const char* 	line = "\xE2\x94\x80";
-	const char* barre = "\xE2\x94\x82";
-	const char*	coin_hg = "\xE2\x94\x8c";
-	const char*	coin_hd = "\xE2\x94\x90";
-	const char*	coin_bd = "\xE2\x94\x94";
-	const char*	coin_bg = "\xE2\x94\x98";
-	const char*	barre_g = "\xE2\x94\xA4";
-	const char*	barre_b = "\xE2\x94\xAC";
-	const char*	barre_h = "\xE2\x94\xB4";
-	const char*	plus = "\xE2\x94\xBC";
-	const char* 	barre_d = "\xE2\x94\x9C";
-	if (i == 0) //coin de haut-gauche
-	{
-		droite = map2[i + 1];
-		bas = map2[i + 21];
+    // Taille de la grille
+    const int COLS = 21;
+    const int ROWS = 12;
 
-		//cout << i << ";" << map2[i] << endl;
-		//cout << droite << "d;b" << bas << endl;
-		// SAFE
-		if (droite == 1 && estVide(bas))
+    // Calcule les coordonnées (ligne, colonne)
+    int row = i / COLS;
+    int col = i % COLS;
+
+    // Récupère les voisins (avec vérification des limites)
+    int haut   = (row > 0)        ? map2[i - COLS] : -1; 
+    int bas    = (row < ROWS - 1) ? map2[i + COLS] : -1;
+    int gauche = (col > 0)        ? map2[i - 1]    : -1;
+    int droite = (col < COLS - 1) ? map2[i + 1]    : -1;
+    //? est l'opérateur ternaire ici on as if (row > 0) {haut = map2[i-COLS]} else {haut = -1} 
+
+    //Unicode
+    const char* line     = "\xE2\x94\x80"; // ─
+    const char* barre    = "\xE2\x94\x82"; // │
+    const char* coin_hg  = "\xE2\x94\x8c"; // ┌
+    const char* coin_hd  = "\xE2\x94\x90"; // ┐
+    
+    const char* coin_bg  = "\xE2\x94\x94"; // └
+    const char* coin_bd  = "\xE2\x94\x98"; // ┘
+    const char* barre_g  = "\xE2\x94\xa4"; // ┤
+    
+    const char* barre_d  = "\xE2\x94\x9c"; // ├
+    const char* barre_b  = "\xE2\x94\xac"; // ┬
+    
+    const char* barre_h  = "\xE2\x94\xb4"; // ┴
+    const char* plus     = "\xE2\x94\xbc"; // ┼
+    const char* center	 = "\xC2\xB7"; // ·
+    
+
+    //coin de haut-gauche
+    if (col == 0 && row == 0) 
+	{
+		if (estRempliCoin(droite) && estVideCoin(bas))
 			return line;
-		else if (estVide(droite) && bas == 1)
+		else if (estVideCoin(bas) && estRempliCoin(bas))
 			return barre;
 		else
 			return coin_hg;
 
 	}
-	else if (i+1  == 21) //coin de haut-droite
+	
+	//coin de haut-droite
+	else if (col == COLS-1 && row == 0) 
 	{
-		gauche = map2[i - 1];
-                bas = map2[i + 21];
-
-		//cout << i << ";" << map2[i] << endl;
-		//cout << gauche << "g;b" << bas << endl;
-		//SAFE
-                if (gauche == 1 && estVide(bas))
+                if (estRempliCoin(gauche) && estVideCoin(bas))
 			return line;
-                else if (estVide(haut) && bas == 1)
+                else if (estVideCoin(gauche) && estRempliCoin(bas))
                         return barre;
                 else
                         return coin_hd;
 
 	}
-	else if (i+1 == 11*21) //coin bas-gauche
+	
+	//coin bas-gauche
+	else if (col == 0 && row == ROWS-1) 
 	{
-                droite = map2[i + 1];
-                haut = map2[i - 21];
-
-		//cout << i << ";" << map2[i] << endl;
-		//cout << droite << "d;h" << haut << endl;
-		// SAFE
-                if (droite == 1 && estVide(haut))
+                if (estRempliCoin(droite) && estVideCoin(haut))
                         return line;
-                else if (estVide(droite) && haut == 1)
+                else if (estVideCoin(droite) && estRempliCoin(haut))
                         return barre;
                 else
                         return coin_bg;
 
         }
-
-	else if (i+1 == 12*21) //coin de bas-droite
+	
+	//coin de bas-droite
+	else if (col == COLS-1 && row == ROWS-1) 
 	{
-                gauche = map2[i - 1];
-                haut = map2[i - 21];
-		//cout << i << ";" << map2[i] << endl;
-		//cout << gauche << "g;h" << haut << endl;
-		// SAFE
-                if (gauche == 1 && estVide(haut))
+                if (estRempliCoin(gauche) && estVideCoin(haut))
 			return line;
-                else if (estVide(gauche) && haut == 1)
+                else if (estVideCoin(gauche) && estRempliCoin(haut))
                         return barre;
                 else
                         return coin_bd;
 
         }
-
-	else if (i > 0 && i+1 <21) //ligne haut
+/////////////////////////////////////////////////////////////////////
+	//ligne haut
+	else if (row == 0) 
 	{
-		droite = map2[i + 1];
-		gauche = map2[i - 1];
-		bas = map2[i + 21];
-		//cout << i << ";" << map2[i] << endl;
-		//cout << droite << "d;g" << gauche << ";b"<< bas << '\n' << endl;
-		// SAFE
-		if (estVide(droite) && estVide(gauche) && bas == 1)
-			return barre_b;
-		else if (estVide(gauche) && droite == 1 && bas == 1)
+		if (estVideCoin(droite) && estVideCoin(gauche) && estRempliCoin(bas))
+			return barre;
+		else if (estVideCoin(gauche) && estRempliCoin(droite) && estRempliCoin(bas))
 			return coin_hg;
-		else if (gauche == 1 && estVide(droite) && bas == 1)
+		else if (estRempliCoin(gauche) && estVideCoin(droite) && estRempliCoin(bas))
 			return coin_hd;
 		else
 			return line;
 	}
-	else if (i+1 > 11*21 && i+1 < 12*21) //ligne bas
+/////////////////////////////////////////////////////////////////////
+	//ligne bas
+	else if (row == ROWS-1) 
         {
-                droite = map2[i + 1];
-                gauche = map2[i - 1];
-                haut = map2[i - 21];
                 if (estVide(droite) && estVide(gauche) && haut == 1)
                         return barre_h;
                 else if (estVide(gauche) && droite == 1 && haut == 1)
@@ -162,11 +152,10 @@ const char* Maze::changeToTileset(const char* map[21*12], int map2[21*12], int i
                 else
                         return line;
         }
-	else if (i+1 % 21 == 1)//ligne gauche
+        
+        //ligne gauche
+	else if (col == 0)
         {
-                droite = map2[i + 1];
-                bas = map2[i + 21];
-                haut = map2[i - 21];
                 if (estVide(haut) && droite == 1 && bas == 1)
 			return coin_hg;
 		else if (haut == 1 && droite == 1 && estVide(bas))
@@ -180,11 +169,10 @@ const char* Maze::changeToTileset(const char* map[21*12], int map2[21*12], int i
                 else
                         return barre;
         }
-	else if (i+1 % 21 == 0)//ligne de droite
+        
+        //ligne de droite
+	else if (col == COLS-1)
         {
-                gauche = map2[i - 1];
-                bas = map2[i + 21];
-                haut = map2[i - 21];
                 if (estVide(haut) && gauche == 1 && bas == 1)
                         return coin_hd;
                 else if (haut == 1 && gauche == 1 && estVide(bas))
@@ -198,13 +186,10 @@ const char* Maze::changeToTileset(const char* map[21*12], int map2[21*12], int i
                 else
                         return barre;
         }
-	else //au centre
+        
+        //au centre
+	else 
 	{
-		droite = map2[i + 1];
-		gauche = map2[i - 1];
-		bas = map2[i + 21];
-		haut = map2[i - 21];
-
 		if (haut == 1 && estVide(droite) && bas == 1 && estVide(gauche))
 			return barre;
 		else if (estVide(haut) && droite == 1 && estVide(bas) && gauche == 1)
@@ -228,6 +213,8 @@ const char* Maze::changeToTileset(const char* map[21*12], int map2[21*12], int i
 		else
 			return plus;
 		}
+		
+	//cas au cas-où qui ne sera jamais atteint
 	return " ";
 }
 
@@ -236,25 +223,25 @@ bool	Maze::estVide(int val)
 	return val == 0 || val == 3 || val == 2;
 }
 
+bool	Maze::estVideCoin(int val)
+{
+	return val == 0;
+}
+
+bool	Maze::estRempliCoin(int val)
+{
+	return val == 1 || val == 2 || val == 3;
+}
 
 //Surcharge --> Affichage
-ostream& operator << (ostream& os, const Maze& m){
-	int	i;
-
-	/*for (i=0; i<21*12 ; i++) 
-	{
-	if (i%21 == 0) cout<< endl;
-		os << m._map[i] << "";
-	}	
-	cout <<endl;*/
-	for (i=0; i<21*12-1 ; i++) 
-	{
-	if (i%21 == 0) cout<< endl;
-		os << m._map[i] << "";
-	}	
-	cout <<endl;
+ostream& operator<<(ostream& os, const Maze& l) {
+	for (int i = 0; i < 21 * 12; ++i) {
+		os << l._map[i];
+		if ((i + 1) % 21 == 0)
+			os << '\n';
+	}
 	return os;
-} 
+}
 
 int main() 
 {
