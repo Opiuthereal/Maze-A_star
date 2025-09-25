@@ -26,31 +26,38 @@ friend std::ostream& operator << (std::ostream& os, const Maze& m);
 
 //-------------------------------------------------------------------------
 
-//Definition des constructeurs
-Maze::Maze(string maze_name) {
-ifstream f(maze_name);
-    for (int i=0; i<21*12; i++) {
-        f >> _tab[i];
-    }
-    f.close();
-
-    for (int i=0; i<21*12; i++) {
-        if (estVide(_tab[i])) {
-            if (_tab[i] == 2) _map[i] = "E";   // entrée
-            else if (_tab[i] == 3) _map[i] = "S"; // sortie
-            else _map[i] = " ";  // case vide
-        } else {
-            _map[i] = changeToTileset(_map, _tab, i); // mur avec joli caractère
-        }
-    }
+//Definition du constructeur
+Maze::Maze(string maze_name) 
+{
+	const char* fleche_bas = "\xE2\xAC\x87"; // ⬇
+	ifstream f(maze_name);
+	for (int i=0; i<21*12; i++) 
+	{
+		f >> _tab[i];
+	}
+	f.close();
+	for (int i=0; i<21*12; i++) 
+	{
+		if (estVide(_tab[i])) 
+		{
+			if (_tab[i] == 2) 
+				_map[i] = fleche_bas;   // entrée
+			else if (_tab[i] == 3) 
+				_map[i] = fleche_bas; // sortie
+			else 
+				_map[i] = " ";  // case vide
+		} 
+		else
+			_map[i] = changeToTileset(_map, _tab, i);
+	}
 }
 	const char* Maze::changeToTileset(const char* map[21*12], int map2[21*12], int i)
 {
-    // Taille de la grille
+    // Taille du labyrinth
     const int COLS = 21;
     const int ROWS = 12;
 
-    // Calcule les coordonnées (ligne, colonne)
+    // coordonnées de i
     int row = i / COLS;
     int col = i % COLS;
 
@@ -126,7 +133,6 @@ ifstream f(maze_name);
                         return coin_bd;
 
         }
-/////////////////////////////////////////////////////////////////////
 	//ligne haut
 	else if (row == 0) 
 	{
@@ -136,10 +142,12 @@ ifstream f(maze_name);
 			return coin_hg;
 		else if (estRempliCoin(gauche) && estVideCoin(droite) && estRempliCoin(bas))
 			return coin_hd;
+		else if (estRempliCoin(gauche) && estRempliCoin(droite) && estRempliCoin(bas))
+			return barre_b;
 		else
 			return line;
 	}
-/////////////////////////////////////////////////////////////////////
+
 	//ligne bas
 	else if (row == ROWS-1) 
         {
@@ -149,6 +157,8 @@ ifstream f(maze_name);
                         return coin_bg;
                 else if (gauche == 1 && estVide(droite) && haut == 1)
                         return coin_bd;
+                else if (gauche == 1 && droite == 1 && haut == 1)
+                	return barre_h;
                 else
                         return line;
         }
@@ -192,7 +202,17 @@ ifstream f(maze_name);
 	{
 		if (haut == 1 && estVide(droite) && bas == 1 && estVide(gauche))
 			return barre;
+		else if (estVide(haut) && estVide(droite) &&  estVide(bas) && estVide(gauche))
+			return center;
+		else if (estVide(haut) && estVide(droite) &&  bas == 1 && estVide(gauche))
+			return barre;
+		else if (haut == 1 && estVide(droite) &&  estVide(bas) && estVide(gauche))
+			return barre;
+		else if (estVide(haut) && estVide(droite) &&  estVide(bas) && gauche == 1)
+			return line;
 		else if (estVide(haut) && droite == 1 && estVide(bas) && gauche == 1)
+			return line;
+		else if (estVide(haut) && droite == 1 &&  estVide(bas) && estVide(gauche))
 			return line;
 		else if (haut == 1 && droite == 1 && estVide(bas) && gauche == 1)
 			return barre_h;
@@ -204,7 +224,7 @@ ifstream f(maze_name);
 			return barre_g;
 		else if (haut == 1 && droite == 1 && estVide(bas) && estVide(gauche))
 			return coin_bg;
-		else if (haut == 1 && estVide(droite) && bas == 1 && gauche == 1)
+		else if (haut == 1 && estVide(droite) && estVide(bas) && gauche == 1)
 			return coin_bd;
 		else if (estVide(haut) && droite == 1 && bas == 1 && estVide(gauche))
 			return coin_hg;
