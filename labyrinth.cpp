@@ -1,30 +1,14 @@
+/////////////////////////////////////////////////////////////////
+//     A FAIRE: Faire le passage dans le tableau mapStat       //
+/////////////////////////////////////////////////////////////////
+
 #include<iostream>
 #include<fstream>
 #include<cstring>
-#include<algorithm>
-#include<iterator>
+#include"labyrinth.h"
+#include"agent.h"
 
 using namespace std;
-
-class Maze {
-	private : 
-		int _tab[21*12]; //Tableau pour les valeur
-		const char* _map[21*12]; //Tableau pour l'affichage "graffique" du maze
-
-		const char* changeToTileset(const char* map[21*12], int map2[21*12], int i); //méthode pour bien afficher le main
-		bool	estVide(int val);
-		bool	estVideCoin(int val);
-		bool	estRempliCoin(int val);
-
-	public : 
-		//Constructor : affichage du maze
-		Maze(string maze_name);
-
-//Surcharge 
-friend std::ostream& operator << (std::ostream& os, const Maze& m);
-};
-
-//-------------------------------------------------------------------------
 
 //Definition du constructeur
 Maze::Maze(string maze_name) 
@@ -76,7 +60,7 @@ Maze::Maze(string maze_name)
     
     const char* coin_bg  = "\xE2\x94\x94"; // └
     const char* coin_bd  = "\xE2\x94\x98"; // ┘
-    const char* barre_g  = "\xE2\x94\xa4"; // ┤
+    const char* barre_g  = "\xE2\x94\xA4"; // ┤
     
     const char* barre_d  = "\xE2\x94\x9c"; // ├
     const char* barre_b  = "\xE2\x94\xac"; // ┬
@@ -262,10 +246,27 @@ ostream& operator<<(ostream& os, const Maze& l) {
 	}
 	return os;
 }
+// Getters et Setters
+int		Maze::getTab(int i){return _tab[i];}
+const char*	Maze::getMap(int i){return _map[i];}
+int		Maze::getMapStat(int i){return _mapStat[i];}
+void		Maze::setTab(int i, int v){_tab[i] = v;}
+void		Maze::setMap(int i, const char* v) { _map[i] = v;}
+void		Maze::setMapStat(int i, int v) {_mapStat[i] = v;}
 
+/*
+int	Maze::getCols()		{return _cols;}
+int	Maze::getRows()		{return _rows;}
+void	Maze::setCols(int v)	{_cols = v;}
+void	Maze::setRows(int v)	{_rows = v;}
+*/
 int main() 
 {
 	Maze m("source.mz");
+	Agent agent1(m);
+	//agent1.setSud(3);
+	//cout << agent1.getSud() << endl;
+	cout << agent1;
 	cout << m;
 	return 0;
 }
