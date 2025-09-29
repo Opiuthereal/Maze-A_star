@@ -27,7 +27,7 @@ class Agent
 			Agent();
 			Agent(Maze& m);
 			Agent(int n, int s, int e, int o, int v);
-		void	déplacementRand(Maze& m);
+		void	wayRand(Maze& m);
 friend std::ostream& operator << (std::ostream& os, const Agent& a);
 };
 #endif

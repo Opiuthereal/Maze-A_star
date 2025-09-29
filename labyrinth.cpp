@@ -32,10 +32,10 @@ Maze::Maze(string maze_name)
 				_map[i] = " ";  // case vide
 		} 
 		else
-			_map[i] = changeToTileset(_map, _tab, i);
+			_map[i] = changeToTileset(i);
 	}
 }
-	const char* Maze::changeToTileset(const char* map[21*12], int map2[21*12], int i)
+	const char* Maze::changeToTileset(int i)
 {
     // Taille du labyrinth
     const int COLS = 21;
@@ -46,11 +46,11 @@ Maze::Maze(string maze_name)
     int col = i % COLS;
 
     // Récupère les voisins (avec vérification des limites)
-    int haut   = (row > 0)        ? map2[i - COLS] : -1; 
-    int bas    = (row < ROWS - 1) ? map2[i + COLS] : -1;
-    int gauche = (col > 0)        ? map2[i - 1]    : -1;
-    int droite = (col < COLS - 1) ? map2[i + 1]    : -1;
-    //? est l'opérateur ternaire ici on as if (row > 0) {haut = map2[i-COLS]} else {haut = -1} 
+    int haut   = (row > 0)        ? _tab[i - COLS] : -1; 
+    int bas    = (row < ROWS - 1) ? _tab[i + COLS] : -1;
+    int gauche = (col > 0)        ? _tab[i - 1]    : -1;
+    int droite = (col < COLS - 1) ? _tab[i + 1]    : -1;
+    //? est l'opérateur ternaire ici on as if (row > 0) {haut = _tab[i-COLS]} else {haut = -1} 
 
     //Unicode
     const char* line     = "\xE2\x94\x80"; // ─
@@ -251,8 +251,8 @@ int		Maze::getTab(int i){return _tab[i];}
 const char*	Maze::getMap(int i){return _map[i];}
 int		Maze::getMapStat(int i){return _mapStat[i];}
 void		Maze::setTab(int i, int v){_tab[i] = v;}
-void		Maze::setMap(int i, const char* v) { _map[i] = v;}
-void		Maze::setMapStat(int i, int v) {_mapStat[i] = v;}
+void		Maze::setMap(int i, const char* v){ _map[i] = v;}
+void		Maze::setMapStat(int i, int v){_mapStat[i] = v;}
 
 /*
 int	Maze::getCols()		{return _cols;}
@@ -268,5 +268,6 @@ int main()
 	//cout << agent1.getSud() << endl;
 	cout << agent1;
 	cout << m;
+	agent1.wayRand(m);
 	return 0;
 }

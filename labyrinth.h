@@ -11,13 +11,13 @@ class Maze {
 		int		_mapStat[21*12]; // Tableau pour le passage
 		/*int		_cols;
 		int		_rows;*/
-		const char*	changeToTileset(const char* map[21*12], int map2[21*12], int i); 
 		bool		estVide(int val);
 		bool		estVideCoin(int val);
 		bool		estRempliCoin(int val);
 
 	public : 
 				Maze(std::string maze_name);
+		const char*	changeToTileset(int i); 
 		int		getTab(int i);
 		const char*	getMap(int i);
 		int		getMapStat(int i);
