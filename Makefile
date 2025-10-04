@@ -8,14 +8,14 @@ LIBS = -lglfw -ldl -lGL
 CFLAGS = -Wall -std=c++17 $(INCLUDE)
 
 
-affichage: main.o affichage.o glad.o
-	$(CC) main.o affichage.o glad.o $(CFLAGS) $(LIBS) -o affichage
+affichage: main.o window.o glad.o
+	$(CC) main.o window.o glad.o $(CFLAGS) $(LIBS) -o affichage
 
-main.o: main.cpp affichage.h
+main.o: main.cpp window.h
 	$(CC) $(CFLAGS) -c main.cpp -o main.o
 	
-affichage.o: affichage.cpp affichage.h
-	$(CC) $(CFLAGS) -c affichage.cpp -o affichage.o
+window.o: window.cpp window.h
+	$(CC) $(CFLAGS) -c window.cpp -o window.o
 
 glad.o: glad/src/glad.c glad/include/glad/glad.h
 	$(CC) $(CFLAGS) -c glad/src/glad.c -o glad.o

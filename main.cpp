@@ -1,4 +1,5 @@
-#include "affichage.h"
+#include<iostream>
+#include "window.h"
 using namespace std;
 
 int main() 
@@ -6,7 +7,7 @@ int main()
 	Window window(800, 600, "Labyrinthe 3D");
 	float floorVertices[] = 
 	{
-		// positions       // couleurs
+		//positions          //couleurs
 		-1.0f, -0.5f, 0.0f,   1.0f, 0.8f, 0.3f,  // bas gauche
 		1.0f, -0.5f, 0.0f,   1.0f, 0.8f, 0.3f,  // bas droite
 		1.0f, -1.0f, 0.0f,   1.0f, 0.8f, 0.3f,  // bas-bas droite
@@ -22,7 +23,7 @@ int main()
 	v3 ---- v2
 	*/
 	
-	// crée le VAO et deux buffers pour VBO et EBO
+	//crée le VAO et deux buffers pour VBO et EBO
 	unsigned int VBO, VAO, EBO;
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
@@ -39,7 +40,7 @@ int main()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-	// Attribut position
+	// Attribut position 0 (position des points)
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 	// Attribut couleur
@@ -47,7 +48,8 @@ int main()
 	// active l'attribut 1 (couleur)
 	glEnableVertexAttribArray(1);
 	
-	// Vertex Shader
+	//Vertex Shader: calcule la position finale du sommet à l’écran
+	//Prépare les données pour le rasterizer (sert à transformer ces données en pixel prêt à être coloriés)
 	const char* vertexShaderSource = R"(
 	#version 330 core
 	layout (location = 0) in vec3 aPos;
@@ -60,7 +62,7 @@ int main()
 	}
 	)";
 
-	// Fragment Shader
+	//Fragment Shader: colorie les pixels
 	const char* fragmentShaderSource = R"(
 	#version 330 core
 	in vec3 ourColor;
@@ -71,22 +73,25 @@ int main()
 	}
 	)";
 	
-	// 1. Créer et compiler le vertex shader
+	//Créer et compiler le vertex shader
 	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
 	glCompileShader(vertexShader);
 
-	// Vérification des erreurs
+	//Vérification des erreurs
 	int success;
+	//tableau de caractères pour récupérer le message d’erreur renvoyé par OpenGL si la compilation échoue
 	char infoLog[512];
+	//après cette ligne success vaut True ou False en fonction de l'initialisation de vertex shader.
 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
 	if (!success) 
 	{
+		//récupère le message d'erreur
 		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
 		cerr << "Erreur compilation vertex shader:\n" << infoLog << endl;
 	}
 
-	// 2. Créer et compiler le fragment shader
+	//Créer et compiler le fragment shader
 	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
 	glCompileShader(fragmentShader);
@@ -98,13 +103,13 @@ int main()
 		cerr << "Erreur compilation fragment shader:\n" << infoLog << endl;
 	}
 
-	// 3. Créer le programme et lier
+	//Créer le programme et lier
 	unsigned int shaderProgram = glCreateProgram();
 	glAttachShader(shaderProgram, vertexShader);
 	glAttachShader(shaderProgram, fragmentShader);
 	glLinkProgram(shaderProgram);
 
-	// Vérifier les erreurs de linkage
+	//Vérifier les erreurs de linkage
 	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
 	if (!success) 
 	{
@@ -112,7 +117,7 @@ int main()
 		cerr << "Erreur linkage shader program:\n" << infoLog << endl;
 	}
 
-	// 4. Nettoyer les shaders temporaires (ils sont déjà liés)
+	//Nettoyer les shaders temporaires (ils sont déjà liés)
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 
