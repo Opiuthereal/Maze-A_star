@@ -1,0 +1,5 @@
+#Exe
+*.out
+perfect.txt
+agentTest.cpp
+testlabyrinth.cpp

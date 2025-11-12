@@ -1,7 +1,6 @@
 #include <iostream>
 #include"labyrinth.h"
-#ifndef _agent_h
-#define _agent_h
+#pragma once
 
 class Agent
 {
@@ -27,7 +26,6 @@ class Agent
 			Agent();
 			Agent(Maze& m);
 			Agent(int n, int s, int e, int o, int v);
-		void	wayRand(Maze& m);
+		int	wayRand(Maze& m);
 friend std::ostream& operator << (std::ostream& os, const Agent& a);
 };
-#endif

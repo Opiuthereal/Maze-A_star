@@ -1,5 +1,11 @@
-/////////////////////////////////////////////////////////////////
-//     A FAIRE: Faire le passage dans le tableau mapStat       //
+        /////////////////////////////////////////////////////////////////
+       //                          A FAIRE:                           //
+      //  Utiliser la convolution sur ChangeToTileset(optimisation)  //
+     //                                                             // 
+    //      Faire les cheminements suivant (depth first, a*)       //
+   //                                                             //
+  //   optionel: Djikstra et l'algorithme plus rapide découvert  //
+ //                           récemment                         //
 /////////////////////////////////////////////////////////////////
 
 #include<iostream>
@@ -34,8 +40,28 @@ Maze::Maze(string maze_name)
 		else
 			_map[i] = changeToTileset(i);
 	}
+	
+	const char* temp[10] = {
+		"\x1b[48;2;255;200;200m \x1b[0m", // rouge très pâle
+		"\x1b[48;2;255;170;170m \x1b[0m", // rouge pâle
+		"\x1b[48;2;255;140;140m \x1b[0m", // rouge clair
+		"\x1b[48;2;255;110;110m \x1b[0m", // rouge moyen
+		"\x1b[48;2;230;90;90m \x1b[0m",   // rouge plus foncé
+		"\x1b[48;2;200;70;70m \x1b[0m",   // rouge sombre
+		"\x1b[48;2;170;50;50m \x1b[0m",   // rouge/marron clair
+		"\x1b[48;2;140;40;40m \x1b[0m",   // rouge/marron moyen
+		"\x1b[48;2;110;30;30m \x1b[0m",   // rouge/marron foncé léger
+		"\x1b[48;2;90;20;20m \x1b[0m"     // rouge/marron foncé 
+	};
+
+
+	for (int i = 0; i < 10; ++i) 
+	{
+		_colorNum[i] = temp[i];
+	}
 }
-	const char* Maze::changeToTileset(int i)
+
+const char*	Maze::changeToTileset(int i)
 {
     // Taille du labyrinth
     const int COLS = 21;
@@ -221,53 +247,43 @@ Maze::Maze(string maze_name)
 	//cas au cas-où qui ne sera jamais atteint
 	return " ";
 }
+//condition pour réduire le nb de char par lignes
+bool	Maze::estVide(int val) {return val == 0 || val == 3 || val == 2;}
+bool	Maze::estVideCoin(int val) {return val == 0;}
+bool	Maze::estRempliCoin(int val) {return val == 1 || val == 2 || val == 3;}
 
-bool	Maze::estVide(int val)
+//Surcharge --> Affichage 
+ostream& operator<<(ostream& os, const Maze& m) 
 {
-	return val == 0 || val == 3 || val == 2;
-}
-
-bool	Maze::estVideCoin(int val)
-{
-	return val == 0;
-}
-
-bool	Maze::estRempliCoin(int val)
-{
-	return val == 1 || val == 2 || val == 3;
-}
-
-//Surcharge --> Affichage
-ostream& operator<<(ostream& os, const Maze& l) {
-	for (int i = 0; i < 21 * 12; ++i) {
-		os << l._map[i];
+	for (int i = 0; i < 21 * 12; ++i) 
+	{
+		os << m._map[i];
 		if ((i + 1) % 21 == 0)
 			os << '\n';
 	}
+	os << "légende: \n";
+	for (int i = 0; i < 9; i++)
+	{
+		os << m._colorNum[i] << ": " << i*10 << " à " << (i+1)*10-1 << " passages\n";
+	}
+	os << m._colorNum[9] << ": 90+ passages\n";
 	return os;
 }
 // Getters et Setters
-int		Maze::getTab(int i){return _tab[i];}
-const char*	Maze::getMap(int i){return _map[i];}
-int		Maze::getMapStat(int i){return _mapStat[i];}
-void		Maze::setTab(int i, int v){_tab[i] = v;}
-void		Maze::setMap(int i, const char* v){ _map[i] = v;}
-void		Maze::setMapStat(int i, int v){_mapStat[i] = v;}
+int		Maze::getTab(int i)			{ return _tab[i]; }
+const char*	Maze::getMap(int i)			{ return _map[i]; }
+int		Maze::getMapStat(int i)			{ return _mapStat[i]; }
+void		Maze::setTab(int i, int v)		{ _tab[i] = v; }
+void		Maze::setMap(int i, const char* v)	{ _map[i] = v; }
+void		Maze::setMapStat(int i, int v)		{ _mapStat[i] = v; }
 
-/*
-int	Maze::getCols()		{return _cols;}
-int	Maze::getRows()		{return _rows;}
-void	Maze::setCols(int v)	{_cols = v;}
-void	Maze::setRows(int v)	{_rows = v;}
-*/
-int main() 
+// Compter le nombre de passage par lignes
+void Maze::setPassage(int i) {_mapStat[i]++;}
+void Maze::setColor(int i)
 {
-	Maze m("source.mz");
-	Agent agent1(m);
-	//agent1.setSud(3);
-	//cout << agent1.getSud() << endl;
-	cout << agent1;
-	cout << m;
-	agent1.wayRand(m);
-	return 0;
+	int val = _mapStat[i];
+	if (val <= 110)
+		_map[i] = _colorNum[val%10];
+	else
+		_map[i] = _colorNum[9];
 }

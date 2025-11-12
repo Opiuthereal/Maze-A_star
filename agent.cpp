@@ -1,6 +1,7 @@
 #include<iostream>
 #include "agent.h"
 #include <cstdlib>
+#include <random>
 #include <ctime>
 #include <chrono>
 #include <thread>
@@ -20,8 +21,9 @@ using namespace std;
 	{
 		//Je part du postulat qu'un labyrinth à toujours une entrée
 		int i = -1;
+		_val = -1;
 		while (m.getTab(++i) != 2);
-		setAgent(i, m);
+			setAgent(i, m);
 	}
 	
 	Agent::Agent(int n, int s, int e, int o, int v)
@@ -50,6 +52,11 @@ int	Agent::getVal()		{return _val;}
 // update la pos de l'agent
 void	Agent::setAgent(int i, Maze& m)
 {
+	if (_val != -1)
+	{
+		m.setPassage(_val);
+		m.setColor(_val);
+	}
 	_val = i;
 	_nord = (i >= 21) ? m.getTab(i-21) : 1;
 	_sud = (i <= 11*21-1) ? m.getTab(i+21) : 1;
@@ -58,41 +65,59 @@ void	Agent::setAgent(int i, Maze& m)
 	m.setMap(i , "\xE2\x80\xA2"); // •
 }
 
-void	Agent::wayRand(Maze& m)
-{
-	srand(time(nullptr));  // initialise le générateur avec l'heure actuelle
+int	Agent::wayRand(Maze& m)
+{	
+	static random_device rd;              // source de vraie randomness
+	static mt19937 gen(rd());             // moteur pseudo-aléatoire
+	uniform_int_distribution<> dis(0, 3); // valeurs de 0 à 3
+	int i = 0;
 	int randMove; // nombre aléatoire entre 0 et 3
 	
 	while(m.getTab(_val) != 3)
 	{
-		randMove = rand() % 4;
-		m.setMap(_val ," ");
+		randMove = dis(gen); //génère un nombre aléatoir de 0 à 3
 		if (randMove == 0 && (_nord == 0 || _nord == 2 || _nord == 3))
 		{
+			//mis en haut pour évter d'effacer la dernière ligne
+			//system("clear");
 			setAgent(_val-21 , m);
-			cout << m << endl;
-			this_thread::sleep_for(chrono::milliseconds(10));
+			//cout << m << endl;
+			i++;
+			//cout << "nombre de déplacement:" << i << endl;
+			//this_thread::sleep_for(chrono::milliseconds(10));
 		}	
 		else if (randMove == 1 && (_est == 0 || _est == 2 || _est == 3))
 		{
+			//mis en haut pour évter d'effacer la dernière ligne
+			//system("clear");
 			setAgent(_val + 1 , m);
-			cout << m << endl;
-			this_thread::sleep_for(chrono::milliseconds(10));
+			//cout << m << endl;
+			i++;
+			//cout << "nombre de déplacement:" << i << endl;
+			//this_thread::sleep_for(chrono::milliseconds(10));
 		}	
 		else if (randMove == 2 && (_sud == 0 || _sud == 2 || _sud == 3))
 		{
+			//mis en haut pour évter d'effacer la dernière ligne
+			//system("clear");
 			setAgent(_val+21 , m);
-			cout << m << endl;
-			this_thread::sleep_for(chrono::milliseconds(10));
+			//cout << m << endl;
+			i++;
+			//cout << "nombre de déplacement:" << i << endl;
+			//this_thread::sleep_for(chrono::milliseconds(10));
 		}	
 		else if (randMove == 3 && (_ouest == 0 || _ouest == 2 || _ouest == 3))
 		{
+			//mis en haut pour évter d'effacer la dernière ligne
+			//system("clear");
 			setAgent(_val-1 , m);
-			cout << m << endl;
-			this_thread::sleep_for(chrono::milliseconds(10));
+			//cout << m << endl;
+			i++;
+			//cout << "nombre de déplacement:" << i << endl;
+			//this_thread::sleep_for(chrono::milliseconds(10));
 		}
-		
 	}
+	return i;
 }
 
 //Operator
