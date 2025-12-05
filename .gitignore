@@ -2,4 +2,4 @@
 *.out
 perfect.txt
 agentTest.cpp
-testlabyrinth.cpp
+testLabyrinth.cpp

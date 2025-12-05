@@ -1,3 +1,13 @@
+        /////////////////////////////////////////////////////////////////
+       //                          A FAIRE:                           //
+      //  Utiliser la convolution sur ChangeToTileset(optimisation)  //
+     //                                                             // 
+    //            Faire les cheminements suivant (a*)              //
+   //                                                             //
+  //   optionel: Djikstra et l'algorithme plus rapide découvert  //
+ //                           récemment                         //
+/////////////////////////////////////////////////////////////////
+
 #include<iostream>
 #include "agent.h"
 #include"labyrinth.h"
@@ -23,18 +33,19 @@ void	stat()
 		cout << "Essai " << i+1 << ": " << dep << " déplacements\n";
 	}
 	moyenne = moyenne/100;
-	cout << "\nnombre d'essais: 100\n" << "Moyenne: " << moyenne << " pas\n" << "Maximum déplacements: " << maxDep << " pas\n" << "Minimum déplacement: " << minDep << " pas" << endl;
+	cout << "\nnombre d'essais: 100\n" << "Moyenne: " << moyenne << " pas\n" << "Maximum déplacements: " << maxDep << " pas\nMinimum déplacement: " << minDep << " pas" << endl;
 }
 
 int main() 
 {
-	//si besoin d'afficher, il faut aussi retirer les lignes commentés dans les 4 if/else de agent.cpp démarrant ligne 77
-	/*Maze m("source.mz");
+/*si besoin d'afficher le labyrinth, il faut aussi retirer les lignes commentés dans les 4 if/else de agent.cpp démarrant ligne 77. Puis mettre stat() en commentaire.*/
+	Maze m("source.mz");
+	//cout << m;
 	Agent agent1(m);
-	cout << agent1;
-	cout << m;
-	agent1.wayRand(m);*/
+	//cout << agent1;
+	//agent1.wayRand(m);
+	agent1.wayDFS(m);
 	
-	stat();
+	//stat();
 	return 0;
 }

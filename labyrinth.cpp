@@ -1,13 +1,3 @@
-        /////////////////////////////////////////////////////////////////
-       //                          A FAIRE:                           //
-      //  Utiliser la convolution sur ChangeToTileset(optimisation)  //
-     //                                                             // 
-    //      Faire les cheminements suivant (depth first, a*)       //
-   //                                                             //
-  //   optionel: Djikstra et l'algorithme plus rapide découvert  //
- //                           récemment                         //
-/////////////////////////////////////////////////////////////////
-
 #include<iostream>
 #include<fstream>
 #include<cstring>

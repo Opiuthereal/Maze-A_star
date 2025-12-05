@@ -5,6 +5,7 @@
 #include <ctime>
 #include <chrono>
 #include <thread>
+#include <stack>
 
 using namespace std;
 
@@ -19,21 +20,30 @@ using namespace std;
 
 	Agent::Agent(Maze& m)
 	{
-		//Je part du postulat qu'un labyrinth à toujours une entrée
-		int i = -1;
+		//Je part du postula qu'un labyrinth à toujours une entrée
+		int i = 0;
 		_val = -1;
-		while (m.getTab(++i) != 2);
-			setAgent(i, m);
+		while (m.getTab(i) != 2)
+		{
+			i++;
+		}
+		setAgent(i, m);
 	}
 	
 	Agent::Agent(int n, int s, int e, int o, int v)
-{
-	_nord = n;
-	_sud = s;
-	_est = e;
-	_ouest = o;
-	_val = v;
-}
+	{
+		_nord = n;
+		_sud = s;
+		_est = e;
+		_ouest = o;
+		_val = v;
+	}
+
+	Agent::Agent(Maze& m, int v)
+	{
+		cout << "hello";
+		setAgent(v, m);
+	}
 
 //Setters
 void	Agent::setSud(int v)	{_sud = v;}
@@ -79,45 +89,101 @@ int	Agent::wayRand(Maze& m)
 		if (randMove == 0 && (_nord == 0 || _nord == 2 || _nord == 3))
 		{
 			//mis en haut pour évter d'effacer la dernière ligne
-			//system("clear");
+			system("clear");
 			setAgent(_val-21 , m);
-			//cout << m << endl;
+			cout << m << endl;
 			i++;
-			//cout << "nombre de déplacement:" << i << endl;
+			cout << "nombre de déplacement:" << i << endl;
 			//this_thread::sleep_for(chrono::milliseconds(10));
 		}	
 		else if (randMove == 1 && (_est == 0 || _est == 2 || _est == 3))
 		{
 			//mis en haut pour évter d'effacer la dernière ligne
-			//system("clear");
+			system("clear");
 			setAgent(_val + 1 , m);
-			//cout << m << endl;
+			cout << m << endl;
 			i++;
-			//cout << "nombre de déplacement:" << i << endl;
+			cout << "nombre de déplacement:" << i << endl;
 			//this_thread::sleep_for(chrono::milliseconds(10));
 		}	
 		else if (randMove == 2 && (_sud == 0 || _sud == 2 || _sud == 3))
 		{
 			//mis en haut pour évter d'effacer la dernière ligne
-			//system("clear");
+			system("clear");
 			setAgent(_val+21 , m);
-			//cout << m << endl;
+			cout << m << endl;
 			i++;
-			//cout << "nombre de déplacement:" << i << endl;
+			cout << "nombre de déplacement:" << i << endl;
 			//this_thread::sleep_for(chrono::milliseconds(10));
 		}	
 		else if (randMove == 3 && (_ouest == 0 || _ouest == 2 || _ouest == 3))
 		{
 			//mis en haut pour évter d'effacer la dernière ligne
-			//system("clear");
+			system("clear");
 			setAgent(_val-1 , m);
-			//cout << m << endl;
+			cout << m << endl;
 			i++;
-			//cout << "nombre de déplacement:" << i << endl;
+			cout << "nombre de déplacement:" << i << endl;
 			//this_thread::sleep_for(chrono::milliseconds(10));
 		}
 	}
 	return i;
+}
+
+bool	Agent::notIn(int val, int tab[12*21])
+{
+	for (int i = 0; i < 21*12; i++)
+	{
+		if (tab[i]==val)
+		{
+			return false;
+		}
+	}
+	
+	return true;
+}
+
+void	Agent::wayDFS(Maze& m)
+{
+	stack<int> aFaire;
+	int fait[21*12];
+	fill(fait, fait + 21 * 12, -1); //fonction pour remplir "fait" de -1
+	int pos;
+	int i = 0;
+	while (m.getTab(_val) != 3)
+	{
+		if (notIn(_val, fait))
+		{
+			aFaire.push(_val);
+		}
+		pos = aFaire.top();
+		aFaire.pop();
+		fait[i] = pos;
+		setAgent(pos, m);
+	
+		if (_nord != 1 && notIn(pos-21, fait))
+		{
+			aFaire.push(pos-21);
+		}
+		
+		if (_ouest != 1 && notIn(pos-1, fait))
+		{
+			aFaire.push(pos-1);
+		}
+		
+		if (_sud != 1 && notIn(pos+21, fait))
+		{
+			aFaire.push(pos+21);
+		}
+		
+		if (_est != 1 && notIn(pos+1, fait))
+		{
+			aFaire.push(pos+1);
+		}
+		cout << m << endl;
+		this_thread::sleep_for(chrono::milliseconds(1000));
+		i++;
+	}
 }
 
 //Operator

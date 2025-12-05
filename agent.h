@@ -22,10 +22,13 @@ class Agent
 		int	getEst();
 		int	getOuest();
 		int	getVal();
-		void	setAgent(int i, Maze& m);
 			Agent();
 			Agent(Maze& m);
 			Agent(int n, int s, int e, int o, int v);
+			Agent(Maze& m, int v);
+		void	setAgent(int i, Maze& m);
+		bool	notIn(int val, int tab[12*21]);
 		int	wayRand(Maze& m);
+		void	wayDFS(Maze& m);
 friend std::ostream& operator << (std::ostream& os, const Agent& a);
 };
