@@ -1,11 +1,13 @@
 #include<iostream>
 #include "agent.h"
+#include "node.h"
 #include <cstdlib>
 #include <random>
 #include <ctime>
 #include <chrono>
 #include <thread>
 #include <stack>
+#include <vector>
 
 using namespace std;
 
@@ -59,7 +61,7 @@ int	Agent::getEst()		{return _est;}
 int	Agent::getOuest()	{return _ouest;}
 int	Agent::getVal()		{return _val;}
 
-// update la pos de l'agent
+// update la pos de l'agent et l'affiche
 void	Agent::setAgent(int i, Maze& m)
 {
 	if (_val != -1)
@@ -80,7 +82,7 @@ int	Agent::wayRand(Maze& m)
 	static random_device rd;              // source de vraie randomness
 	static mt19937 gen(rd());             // moteur pseudo-aléatoire
 	uniform_int_distribution<> dis(0, 3); // valeurs de 0 à 3
-	int i = 0;
+	int coups = 0;
 	int randMove; // nombre aléatoire entre 0 et 3
 	
 	while(m.getTab(_val) != 3)
@@ -92,8 +94,8 @@ int	Agent::wayRand(Maze& m)
 			system("clear");
 			setAgent(_val-21 , m);
 			cout << m << endl;
-			i++;
-			cout << "nombre de déplacement:" << i << endl;
+			coups++;
+			cout << "nombre de déplacement:" << coups << endl;
 			//this_thread::sleep_for(chrono::milliseconds(10));
 		}	
 		else if (randMove == 1 && (_est == 0 || _est == 2 || _est == 3))
@@ -102,8 +104,8 @@ int	Agent::wayRand(Maze& m)
 			system("clear");
 			setAgent(_val + 1 , m);
 			cout << m << endl;
-			i++;
-			cout << "nombre de déplacement:" << i << endl;
+			coups++;
+			cout << "nombre de déplacement:" << coups << endl;
 			//this_thread::sleep_for(chrono::milliseconds(10));
 		}	
 		else if (randMove == 2 && (_sud == 0 || _sud == 2 || _sud == 3))
@@ -112,8 +114,8 @@ int	Agent::wayRand(Maze& m)
 			system("clear");
 			setAgent(_val+21 , m);
 			cout << m << endl;
-			i++;
-			cout << "nombre de déplacement:" << i << endl;
+			coups++;
+			cout << "nombre de déplacement:" << coups << endl;
 			//this_thread::sleep_for(chrono::milliseconds(10));
 		}	
 		else if (randMove == 3 && (_ouest == 0 || _ouest == 2 || _ouest == 3))
@@ -122,12 +124,12 @@ int	Agent::wayRand(Maze& m)
 			system("clear");
 			setAgent(_val-1 , m);
 			cout << m << endl;
-			i++;
-			cout << "nombre de déplacement:" << i << endl;
+			coups++;
+			cout << "nombre de déplacement:" << coups << endl;
 			//this_thread::sleep_for(chrono::milliseconds(10));
 		}
 	}
-	return i;
+	return coups;
 }
 
 bool	Agent::notIn(int val, int tab[12*21])
@@ -186,6 +188,100 @@ void	Agent::wayDFS(Maze& m)
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+bool Agent::IsIn(int pos, const vector<Node>& v) 
+{
+	for (const Node& e : v) 
+	{
+		if (e.getPos() == pos) 
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+void Agent::wayAStar(Maze& m)
+{
+
+	int n;
+
+	vector<Node> ouvert;
+	vector<Node> fermee;
+
+	int posE = 1;
+	int posS = 250;
+	int choix = 0;
+	int coups = 0;
+
+	//on push l'heuristique des cases adjacentes
+	if (_nord == 0 || _nord == 3) 
+	{
+		ouvert.push_back(Node(_val-21, posE, posS));
+	}
+	if (_sud == 0 || _sud == 3) 
+	{
+		ouvert.push_back(Node(_val+21, posE, posS));
+	}
+	if (_est == 0 || _est == 3) 
+	{
+		ouvert.push_back(Node(_val+1, posE, posS));
+	}
+	if (_ouest == 0 || _ouest == 3) 
+	{
+		ouvert.push_back(Node(_val-1, posE, posS));
+	}
+	//on mets l'entrée dans fermée
+	fermee.push_back(Node(_val, posE, posS));
+
+	
+	while (!ouvert.empty() && _val != posS)
+	{
+		choix=0;
+		//trouver la meilleure heuristique existante
+		for (int i = 1; i < ouvert.size(); i++)
+		{
+			if (ouvert[i].getF() < ouvert[choix].getF())
+			{
+				choix = i;
+			}
+			else if (ouvert[i].getF() == ouvert[choix].getF() && ouvert[i].getH() < ouvert[choix].getH())
+			{
+				choix = i;
+			}
+		}
+		
+		n = ouvert[choix].getPos();
+		setAgent(n, m);
+		
+		//on ajoute les heuristiques qui n'existent pas encore
+		if ((_nord == 0 || _nord == 3) && !IsIn(_val-21, fermee) && !IsIn(_val-21, ouvert)) 
+		{
+			ouvert.push_back(Node(_val-21, posE, posS));
+		}
+		if ((_sud == 0 || _sud == 3) && !IsIn(_val+21, fermee) && !IsIn(_val+21, ouvert)) 
+		{
+			ouvert.push_back(Node(_val+21, posE, posS));
+		}
+		if ((_est == 0 || _est == 3) && !IsIn(_val+1, fermee) && !IsIn(_val+1, ouvert)) 
+		{
+			ouvert.push_back(Node(_val+1, posE, posS));
+		}
+		if ((_ouest == 0 || _ouest == 3) && !IsIn(_val-1, fermee) && !IsIn(_val-1, ouvert)) 
+		{
+			ouvert.push_back(Node(_val-1, posE, posS));
+		}
+
+		fermee.push_back(ouvert[choix]);
+		ouvert.erase(ouvert.begin() + choix);
+		
+		cout << m << endl;
+		coups++;
+		cout << "nombre de déplacement:" << coups << endl;
+		this_thread::sleep_for(chrono::milliseconds(10));
+	}
+}
 //Operator
 ostream& operator << (ostream& os, const Agent& a)
 {

@@ -1,13 +1,3 @@
-        /////////////////////////////////////////////////////////////////
-       //                          A FAIRE:                           //
-      //  Utiliser la convolution sur ChangeToTileset(optimisation)  //
-     //                                                             // 
-    //            Faire les cheminements suivant (a*)              //
-   //                                                             //
-  //   optionel: Djikstra et l'algorithme plus rapide découvert  //
- //                           récemment                         //
-/////////////////////////////////////////////////////////////////
-
 #include<iostream>
 #include "agent.h"
 #include"labyrinth.h"
@@ -44,7 +34,7 @@ int main()
 	Agent agent1(m);
 	//cout << agent1;
 	//agent1.wayRand(m);
-	agent1.wayDFS(m);
+	agent1.wayAStar(m);
 	
 	//stat();
 	return 0;

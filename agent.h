@@ -1,5 +1,7 @@
 #include <iostream>
 #include"labyrinth.h"
+#include"node.h"
+#include <vector>
 #pragma once
 
 class Agent
@@ -28,7 +30,9 @@ class Agent
 			Agent(Maze& m, int v);
 		void	setAgent(int i, Maze& m);
 		bool	notIn(int val, int tab[12*21]);
+		bool	IsIn(int pos, const std::vector<Node>& v); 
 		int	wayRand(Maze& m);
 		void	wayDFS(Maze& m);
+		void	wayAStar(Maze& m);
 friend std::ostream& operator << (std::ostream& os, const Agent& a);
 };

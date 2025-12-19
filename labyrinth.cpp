@@ -259,6 +259,7 @@ ostream& operator<<(ostream& os, const Maze& m)
 	os << m._colorNum[9] << ": 90+ passages\n";
 	return os;
 }
+
 // Getters et Setters
 int		Maze::getTab(int i)			{ return _tab[i]; }
 const char*	Maze::getMap(int i)			{ return _map[i]; }
